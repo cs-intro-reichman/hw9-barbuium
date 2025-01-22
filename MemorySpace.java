@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 /**
  * Represents a managed memory space. The memory space manages a list of allocated 
  * memory blocks, and a list free memory blocks. The methods "malloc" and "free" are 
@@ -59,7 +61,27 @@ public class MemorySpace {
 	 */
 	public int malloc(int length) {		
 		//// Replace the following statement with your code
-		return -1;
+		Node newNode = freeList.getFirst();
+		while (newNode!= null) {
+			if(newNode.block.length >= length){
+				break;
+			}	
+			newNode = newNode.next;
+		}
+		if(newNode == null){
+			return -1;
+		}
+		MemoryBlock newMemoryBlock = new MemoryBlock(newNode.block.baseAddress, length);
+		allocatedList.addLast(newMemoryBlock);
+
+		newNode.block.baseAddress += length;
+		newNode.block.length -= length;
+
+		if(newNode.block.length == 0){
+			freeList.remove(newNode);
+		}
+
+		return newMemoryBlock.baseAddress;
 	}
 
 	/**
@@ -71,7 +93,23 @@ public class MemorySpace {
 	 *            the starting address of the block to freeList
 	 */
 	public void free(int address) {
+		if (allocatedList.getSize() == 0) {
+			throw new IllegalArgumentException("index must be between 0 and size");
+		}
 		//// Write your code here
+		Node current = allocatedList.getFirst();
+		while (current!= null) {
+			if(current.block.baseAddress == address) {
+				break;
+			}
+			current = current.next;
+		}
+		if(current == null){
+			return;
+		}
+		allocatedList.remove(current);
+		freeList.addLast(current.block);
+
 	}
 	
 	/**
@@ -90,5 +128,30 @@ public class MemorySpace {
 	public void defrag() {
 		/// TODO: Implement defrag test
 		//// Write your code here
+		MemoryBlock[] blocks = new MemoryBlock[freeList.getSize()];
+		int i = 0;
+		for (MemoryBlock memoryBlock : freeList) {
+			blocks[i] = memoryBlock;
+			i++;
+		}
+		Arrays.sort(blocks);
+		Node curr = freeList.getFirst();
+		for (int j = 0; j < blocks.length; j++) {
+			curr.block = blocks[j];
+			curr = curr.next;
+		}
+
+
+		for (MemoryBlock block : freeList) {
+			for (MemoryBlock memoryBlock : freeList) {
+				if (block.equals(memoryBlock)) {
+					continue;
+				}
+				if (block.baseAddress + block.length == memoryBlock.baseAddress) {
+					block.length += memoryBlock.length;
+					freeList.remove(memoryBlock);
+				}
+			}
+		}
 	}
 }

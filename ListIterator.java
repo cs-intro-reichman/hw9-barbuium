@@ -1,5 +1,7 @@
+import java.util.Iterator;
+
 /** Represents an iterator of a linked list. */
-public class ListIterator {
+public class ListIterator implements Iterator<MemoryBlock> {
 
     // current position in the list (cursor)
     public Node current;

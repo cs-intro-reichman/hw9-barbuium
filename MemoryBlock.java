@@ -2,7 +2,7 @@
  * Represents a block of memory.
  * Each memory block has a base address, and a length in words. 
  */
-public class MemoryBlock {
+public class MemoryBlock implements Comparable<MemoryBlock> {
 
 	int baseAddress;  // the address where this memory block begins
 	int length;       // the length of this memory block, in words
@@ -38,5 +38,11 @@ public class MemoryBlock {
 	 */
 	public String toString() {
 		return "(" + baseAddress + " , " + length +")";
+	}
+
+	@Override
+	public int compareTo(MemoryBlock o) {
+		// TODO Auto-generated method stub
+		return this.baseAddress - o.baseAddress;
 	}
 }
